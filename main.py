@@ -41,6 +41,27 @@ def login_user(username, password):
         messagebox.showerror("Ошибка", "Неверное имя пользователя или пароль.")
 
 
+def open_login_window():
+    login_window = tk.Tk()
+    login_window.title("Вход")
+    login_window.geometry("400x400")  # Установка размера окна
+
+    tk.Label(login_window, text="Имя пользователя").pack(pady=10)
+    username_entry = tk.Entry(login_window)
+    username_entry.pack(pady=5)
+
+    tk.Label(login_window, text="Пароль").pack(pady=10)
+    password_entry = tk.Entry(login_window, show='*')
+    password_entry.pack(pady=5)
+
+    tk.Button(login_window, text="Войти", command=lambda: login_user(username_entry.get(), password_entry.get())).pack(pady=10)
+    tk.Button(login_window, text="Назад к регистрации", command=lambda: [login_window.destroy(), registration_window()]).pack(pady=10)
+
+    login_window.mainloop()
+
+
+
+
 def start_game():
     pygame.init()
     WIDTH, HEIGHT = 800, 600
