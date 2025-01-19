@@ -1,5 +1,20 @@
 import pygame
 import random
+import sqlite3
+
+
+def init_db():
+    conn = sqlite3.connect('game_data.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY,
+            username TEXT UNIQUE,
+            password TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
 
 pygame.init()
