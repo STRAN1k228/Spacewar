@@ -1,7 +1,8 @@
 import pygame
 import random
 import sqlite3
-
+import tkinter as tk
+from tkinter import messagebox
 
 def init_db():
     conn = sqlite3.connect('game_data.db')
@@ -14,6 +15,17 @@ def init_db():
         )
     ''')
     conn.commit()
+    conn.close()
+
+def register_user(username, password):
+    conn = sqlite3.connect('game_data.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, password))
+        conn.commit()
+        messagebox.showinfo("Успех", "Регистрация прошла успешно!")
+    except sqlite3.IntegrityError:
+        messagebox.showerror("Ошибка", "Пользователь с таким именем уже существует.")
     conn.close()
 
 
