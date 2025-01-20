@@ -90,7 +90,13 @@ def start_game():
                 self.rect.x -= self.speed
             if keys[pygame.K_RIGHT] and self.rect.right < WIDTH:
                 self.rect.x += self.speed
-
+                
+    class Enemy(pygame.sprite.Sprite):
+        def __init__(self):
+            super().__init__()
+            self.image = enemy_image
+            self.rect = self.image.get_rect(center=(random.randint(0, WIDTH), 0))
+            self.speed = random.randint(2, 5)
 
 
 
