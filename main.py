@@ -123,7 +123,6 @@ mod_fire = 1
 Enemy_amount = 5
 start_time = 0
 current_username = ""
-game_paused = False  # Переменная для отслеживания состояния игры
 
 # Инициализация Pygame
 pygame.init()
@@ -214,17 +213,16 @@ def open_game_window():
 
 # Основная логика игры
 def run_game():
-    global total_score, mod_fire, stop_game, game_paused
+    global total_score, mod_fire, stop_game
     total_score = 0
     mod_fire = 1
-    stop_game = False
-    game_paused = False  # Сброс состояния паузы
+    stop_game = False  # Состояние игры
 
     # Создание спрайтов и групп
     global hero
     hero = player('image/spaceshatel.png', 370, 600, 5, 100, 150)
     for i in range(5):
-        Enemies.add(Enemy('image/enemyship.png', random.randint(0, widght_win - wight_enemy) - 100, random.randint(0,  1000) * -1, random.randint(3, 5), wight_enemy, wight_enemy))
+        Enemies.add(Enemy('image/enemyship.png', random.randint(0, widght_win - wight_enemy) - 100, random.randint(0, 1000) * -1, random.randint(3, 5), wight_enemy, wight_enemy))
 
     clock = pygame.time.Clock()
     FPS = 60
@@ -236,23 +234,22 @@ def run_game():
                 pygame.quit()
                 return
             elif e.type == pygame.KEYDOWN:
-                if e.key == pygame.K_SPACE and game_paused:
-                    game_paused = False  # Возвращаем игру в активное состояние
-                    run_game()  # Перезапускаем игру
+                if e.key == pygame.K_SPACE:
+                    hero.fire(mod_fire)  # Стрельба при нажатии пробела
+                if e.key == pygame.K_k and stop_game:  # Переход в главное меню при нажатии K
+                    pygame.quit()  # Закрываем окно игры
+                    open_main_menu(current_username)  # Открываем главное меню
 
         if stop_game:
             end_time = time.time() - start_time
             end_score2 = font2.render('Score: ' + str(total_score), 1, (250, 255, 0))
             end_time_text = font2.render(f'Time: {end_time:.2f} seconds', 1, (250, 255, 0))
-            end_score = font2.render('Press << Space >> to return to menu',  1, (250, 255, 0))
+            end_score = font2.render('Press << K >> to return to menu',  1, (250, 255, 0))
             window.blit(end_score, (200, 395))
             window.blit(end_score2, (250, 350))
             window.blit(end_time_text, (250, 320))
             pygame.display.update()
             continue
-
-        if game_paused:
-            continue  # Игровой цикл приостановлен
 
         window.blit(background, (0, 0))
         hero.update()
@@ -279,15 +276,15 @@ def run_game():
             total_score += 1
             Enemies.add(Enemy('image/enemyship.png', random.randint(0, widght_win - wight_enemy) - 100, random.randint(0, 1000) * -1, random.randint(3, 5), wight_enemy, wight_enemy))
 
-        if pygame.sprite.spritecollide(hero, Enemies, True) or pygame.sprite.spritecollide(hero, meteorit, True):
-            stop_game = True
-            game_paused = True  # Устанавливаем игру в состояние паузы
+        if pygame.sprite.spritecollide(hero, Enemies, True):
+            stop_game = True  # Останавливаем игру
             save_leaderboard(total_score, time.time() - start_time)  # Сохраняем в таблицу лидеров
 
         # Обновление экрана
         pygame.display.update()
         clock.tick(FPS)
 
+# Сохранение в таблицу лидеров
 def save_leaderboard(score, time_taken):
     conn = sqlite3.connect('game_data.db')
     cursor = conn.cursor()
